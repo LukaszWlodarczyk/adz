@@ -10,14 +10,13 @@ from skmultiflow.drift_detection.eddm import EDDM
 from skmultiflow.drift_detection.kswin import KSWIN
 from skmultiflow.drift_detection.page_hinkley import PageHinkley
 
-
-
-neighbors_number = 2
+neighbors_number = 8
 training_test_split_point = 0.2
 accuracy_to_print = []
 symbols = []
 
-delta_adwin = 0.002
+delta_adwin = 0.95
+# delta_adwin = 0.002
 adwin = ADWIN(delta=delta_adwin)
 adwin_change = []
 adwin_warning = []
@@ -37,11 +36,12 @@ eddm = EDDM()
 page_h_change = []
 page_h_warning = []
 page_h_min_instances = 30
-page_h_delta = 0.005
+page_h_delta = 0.99
 page_h_threshold = 50
-page_h_alpha = 0.9999
+page_h_alpha = 0.2
 page_h = PageHinkley(min_instances=page_h_min_instances, delta=page_h_delta,
                      threshold= page_h_threshold, alpha=page_h_alpha)
+# page_h = PageHinkley()
 
 kswin = KSWIN()
 kswin_change = []
@@ -49,7 +49,8 @@ kswin_warning = []
 
 pd.set_option('display.max_columns', None)
 df = pd.read_csv("train.csv")
-# df = df[:10000]
+# df = df[:12500]
+df = df[:2500]
 for sym in df['sym']:
     if sym not in symbols:
         symbols.append(sym)
@@ -121,16 +122,28 @@ print("-----------")
 
 def show_plot(x, y, algorithm, changes, warnings):
     for e in warnings:
-        plt.axvline(e, alpha=0.3, color='orange')
+        plt.axvline(e, alpha=0.3, color='blue')
     for e in changes:
         plt.axvline(e, alpha=0.3, color='red')
 
-    sns.lineplot(x=x, y=y,
-                     alpha=0.4, color='blue')
+    sns.lineplot(x=x, y=y, alpha=0.4, color='green')
     plt.title(f'Accuracy of prediction, {algorithm.upper()}')
     plt.xlabel('number of sample')
     plt.ylabel('% of correct predictions')
     plt.tight_layout()
 
 show_plot([x for x in range(len(y_test))], accuracy_to_print, "eddm", eddm_warning, eddm_change)
-plt.show()
+plt.savefig("eddm.png")
+plt.clf()
+show_plot([x for x in range(len(y_test))], accuracy_to_print, "ddm", ddm_warning, ddm_change)
+plt.savefig("ddm.png")
+plt.clf()
+show_plot([x for x in range(len(y_test))], accuracy_to_print, "kswin", kswin_warning, kswin_change)
+plt.savefig("kswin.png")
+plt.clf()
+show_plot([x for x in range(len(y_test))], accuracy_to_print, "adwin", adwin_warning, adwin_change)
+plt.savefig("adwin.png")
+plt.clf()
+show_plot([x for x in range(len(y_test))], accuracy_to_print, "PageHinkley", page_h_warning, page_h_change)
+plt.savefig("page_h.png")
+plt.clf()
