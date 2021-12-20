@@ -10,14 +10,14 @@ from skmultiflow.drift_detection.eddm import EDDM
 from skmultiflow.drift_detection.kswin import KSWIN
 from skmultiflow.drift_detection.page_hinkley import PageHinkley
 
-neighbors_number = 8
+neighbors_number = 2
 training_test_split_point = 0.2
 accuracy_to_print = []
 symbols = []
 
 delta_adwin = 0.95
 # delta_adwin = 0.002
-adwin = ADWIN(delta=delta_adwin)
+adwin = ADWIN()
 adwin_change = []
 adwin_warning = []
 
